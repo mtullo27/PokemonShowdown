@@ -583,6 +583,47 @@ export const Rulesets: {[k: string]: FormatData} = {
 			}
 		},
 	},
+	"1abilityclause": {
+		effectType: 'ValidatorRule',
+		name: '1 Ability Clause',
+		desc: "Prevents teams from having more than one Pok&eacute;mon with the same ability",
+		onBegin() {
+			this.add('rule', '1 Ability Clause: Limit one of each ability');
+		},
+		onValidateTeam(team) {
+			const abilityTable = new Map<string, number>();
+			const base: {[k: string]: string} = {
+				airlock: 'cloudnine',
+				battlearmor: 'shellarmor',
+				clearbody: 'whitesmoke',
+				dazzling: 'queenlymajesty',
+				emergencyexit: 'wimpout',
+				filter: 'solidrock',
+				gooey: 'tanglinghair',
+				insomnia: 'vitalspirit',
+				ironbarbs: 'roughskin',
+				libero: 'protean',
+				minus: 'plus',
+				moxie: 'chillingneigh',
+				powerofalchemy: 'receiver',
+				propellertail: 'stalwart',
+				teravolt: 'moldbreaker',
+				turboblaze: 'moldbreaker',
+			};
+			for (const set of team) {
+				let ability = this.toID(set.ability);
+				if (!ability) continue;
+				if (ability in base) ability = base[ability] as ID;
+				if ((abilityTable.get(ability) || 0) > 1) {
+					return [
+						`You are limited to one of each ability by 1 Ability Clause.`,
+						`(You have more than two ${this.dex.abilities.get(ability).name} variants)`,
+					];
+				}
+				abilityTable.set(ability, (abilityTable.get(ability) || 0) + 1);
+			}
+		},
+	},
 	ohkoclause: {
 		effectType: 'ValidatorRule',
 		name: 'OHKO Clause',

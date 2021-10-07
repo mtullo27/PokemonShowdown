@@ -550,6 +550,7 @@ export const Rulesets: {[k: string]: FormatData} = {
 			this.add('rule', '2 Ability Clause: Limit two of each ability');
 		},
 		onValidateTeam(team) {
+			if (this.format.id === 'gen8multibility') return;
 			const abilityTable = new Map<string, number>();
 			const base: {[k: string]: string} = {
 				airlock: 'cloudnine',
@@ -614,10 +615,10 @@ export const Rulesets: {[k: string]: FormatData} = {
 				let ability = this.toID(set.ability);
 				if (!ability) continue;
 				if (ability in base) ability = base[ability] as ID;
-				if ((abilityTable.get(ability) || 0) > 1) {
+				if ((abilityTable.get(ability) || 0) >= 1) {
 					return [
 						`You are limited to one of each ability by 1 Ability Clause.`,
-						`(You have more than two ${this.dex.abilities.get(ability).name} variants)`,
+						`(You have more than one ${this.dex.abilities.get(ability).name} variants)`,
 					];
 				}
 				abilityTable.set(ability, (abilityTable.get(ability) || 0) + 1);
@@ -1412,7 +1413,7 @@ export const Rulesets: {[k: string]: FormatData} = {
 		hasValue: 'positive-integer',
 		// hardcoded in sim/side
 		onValidateRule() {
-			if (!this.ruleTable.has('teampreview')) {
+			if (!(this.ruleTable.has('teampreview') || this.ruleTable.has('teamtypepreview'))) {
 				throw new Error(`The "Picked Team Size" rule${this.ruleTable.blame('pickedteamsize')} requires Team Preview.`);
 			}
 		},
